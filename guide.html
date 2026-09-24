@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Руководство по настройке VPS и 3X-UI</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #111827;
+      --card-border: #1f2937;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --accent: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --code-bg: #030712;
+      --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      padding: 24px;
+    }
+    .container { max-width: 1080px; margin: 0 auto; }
+    header {
+      padding: 24px;
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+      border: 1px solid #312e81;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    h1 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #a5b4fc; }
+    .badge-offline {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10b981;
+      color: #34d399;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .config-bar {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .field label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; }
+    .field input {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #60a5fa;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      outline: none;
+    }
+    .field input:focus { border-color: var(--primary); }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: #1e293b;
+      color: #fff;
+      border: 1px solid #334155;
+    }
+    .step-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .step-num {
+      background: #2563eb;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .step-title { font-size: 16px; font-weight: 600; color: #fff; }
+    .desc { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+    .code-top {
+      background: #111827;
+      padding: 6px 12px;
+      border-bottom: 1px solid #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #6b7280;
+    }
+    pre {
+      padding: 14px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #38bdf8;
+      line-height: 1.5;
+    }
+    .copy-btn {
+      background: #1f2937;
+      color: #e5e7eb;
+      border: 1px solid #374151;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .copy-btn:hover { background: #374151; color: #fff; }
+    .alert-box {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #fcd34d;
+    }
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #10b981;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>Руководство по настройке VPS и панели 3X-UI</h1>
+      <div class="subtitle">Автономная шпаргалка: работает в любом браузере без установки Node.js и программ</div>
+    </div>
+    <span class="badge-offline">● Автономный файл (Offline)</span>
+  </header>
+
+  <!-- Интерактивная панель переменных -->
+  <div class="config-bar">
+    <div class="field">
+      <label>IP сервера</label>
+      <input type="text" id="cfg-ip" value="YOUR_SERVER_IP" placeholder="Введите IP вашего сервера" oninput="updateAll()">
+    </div>
+    <div class="field">
+      <label>Пользователь sudo</label>
+      <input type="text" id="cfg-user" value="adminuser" placeholder="Имя пользователя" oninput="updateAll()">
+    </div>
+    <div class="field">
+      <label>Порт SSH</label>
+      <input type="text" id="cfg-ssh" value="22" oninput="updateAll()">
+    </div>
+    <div class="field">
+      <label>Порт панели 3X-UI</label>
+      <input type="text" id="cfg-panel" value="2053" oninput="updateAll()">
+    </div>
+  </div>
+
+  <div class="alert-box alert-danger" style="margin-bottom: 20px;">
+    <strong>⚠️ Главное правило безопасности:</strong> Никогда не закрывайте текущую сессию root, пока не выполните проверку входа во <em>втором отдельном окне терминала</em> командой: <code id="quick-check-ssh" style="background:#000; padding:2px 6px; border-radius:4px;">ssh -p 22 adminuser@YOUR_SERVER_IP</code>
+  </div>
+
+  <!-- Вкладки -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('steps', this)">1. Пошаговые команды</button>
+    <button class="tab-btn" onclick="showTab('ssh-hardening', this)">2. Безопасность SSH</button>
+    <button class="tab-btn" onclick="showTab('ufw-fail2ban', this)">3. Фаервол и Fail2ban</button>
+    <button class="tab-btn" onclick="showTab('xui', this)">4. Панель 3X-UI и Reality</button>
+    <button class="tab-btn" onclick="showTab('apps', this)">5. Клиенты для ПК и смартфонов</button>
+  </div>
+
+  <!-- Таб 1: Шаги -->
+  <div id="tab-steps" class="tab-content">
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div class="step-title">Создание пользователя и sudo</div>
+      </div>
+      <div class="desc">Выполняется под root на сервере:</div>
+      <div class="code-block">
+        <div class="code-top"><span>bash (сервер)</span><button class="copy-btn" onclick="copyCode(this)">Скопировать</button></div>
+        <pre><code class="tmpl">adduser {USER}
+usermod -aG sudo {USER}
+su - {USER} -c "sudo whoami"</code></pre>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div class="step-title">Настройка SSH-ключа и строгих прав</div>
+      </div>
+      <div class="desc">Вставьте ваш публичный ключ в файл authorized_keys:</div>
+      <div class="code-block">
+        <div class="code-top"><span>bash (сервер)</span><button class="copy-btn" onclick="copyCode(this)">Скопировать</button></div>
+        <pre><code class="tmpl">mkdir -p /home/{USER}/.ssh
+chmod 700 /home/{USER}/.ssh
+nano /home/{USER}/.ssh/authorized_keys
+chmod 600 /home/{USER}/.ssh/authorized_keys
+chown -R {USER}:{USER} /home/{USER}/.ssh</code></pre>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <div class="step-title">Установка панели 3X-UI (Официальный скрипт mhsanaei)</div>
+      </div>
+      <div class="desc">Актуальный официальный скрипт установки:</div>
+      <div class="code-block">
+        <div class="code-top"><span>bash (сервер)</span><button class="copy-btn" onclick="copyCode(this)">Скопировать</button></div>
+        <pre><code>bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)</code></pre>
+      </div>
+      <div class="desc" style="margin-top: 10px;">Вход в веб-панель: <a id="panel-link" href="http://YOUR_SERVER_IP:2053" target="_blank" style="color:#60a5fa;">http://YOUR_SERVER_IP:2053</a></div>
+    </div>
+  </div>
+
+  <!-- Таб 2: SSH -->
+  <div id="tab-ssh-hardening" class="tab-content" style="display:none;">
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">🛡️</div>
+        <div class="step-title">Отключение паролей и запрет входа root</div>
+      </div>
+      <div class="desc">Создание изолированного файла конфигурации с максимальным приоритетом:</div>
+      <div class="code-block">
+        <div class="code-top"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Скопировать</button></div>
+        <pre><code class="tmpl">cat << 'EOF' | sudo tee /etc/ssh/sshd_config.d/99-custom-hardening.conf
+Port {SSH}
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+KbdInteractiveAuthentication no
+X11Forwarding no
+MaxAuthTries 3
+EOF
+
+# Проверка синтаксиса:
+sshd -t
+
+# Перезапуск службы:
+sudo systemctl restart ssh || sudo systemctl restart sshd
+
+# Проверка фактического статуса:
+sshd -T | grep -E -i 'permitrootlogin|passwordauthentication|pubkeyauthentication'</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Таб 3: Фаервол -->
+  <div id="tab-ufw-fail2ban" class="tab-content" style="display:none;">
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">🔥</div>
+        <div class="step-title">Настройка фаервола UFW</div>
+      </div>
+      <div class="code-block">
+        <div class="code-top"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Скопировать</button></div>
+        <pre><code class="tmpl">sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# Разрешаем SSH и панель
+sudo ufw allow {SSH}/tcp comment 'SSH Port'
+sudo ufw allow {PANEL}/tcp comment '3X-UI Web Panel'
+
+# Разрешаем входящий VLESS Reality
+sudo ufw allow 443/tcp comment 'Reality HTTPS'
+sudo ufw allow 443/udp comment 'Reality UDP'
+
+sudo ufw enable
+sudo ufw status verbose</code></pre>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">⚡</div>
+        <div class="step-title">Ускорение TCP BBR</div>
+      </div>
+      <div class="code-block">
+        <div class="code-top"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Скопировать</button></div>
+        <pre><code>cat << 'EOF' | sudo tee /etc/sysctl.d/99-bbr.conf
+net.core.default_qdisc=fq
+net.ipv4.tcp_congestion_control=bbr
+EOF
+
+sudo sysctl --system
+sysctl net.ipv4.tcp_congestion_control</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Таб 4: 3X-UI -->
+  <div id="tab-xui" class="tab-content" style="display:none;">
+    <div class="step-card">
+      <div class="step-title" style="margin-bottom:12px;">Параметры создания подключения VLESS Reality:</div>
+      <ul style="padding-left:20px; font-size:13px; color:#cbd5e1; line-height:1.8;">
+        <li><strong>Протокол:</strong> VLESS</li>
+        <li><strong>Порт:</strong> 443</li>
+        <li><strong>Транспорт:</strong> TCP</li>
+        <li><strong>Безопасность (Security):</strong> Reality</li>
+        <li><strong>Dest / SNI:</strong> dl.google.com:443 (или www.microsoft.com:443, yahoo.com:443)</li>
+        <li><strong>ShortId:</strong> Нажмите «Get New» для генерации короткого ID</li>
+        <li><strong>Ключи:</strong> Нажмите «Get New Keys» (сгенерирует Public и Private ключи)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Таб 5: Клиенты -->
+  <div id="tab-apps" class="tab-content" style="display:none;">
+    <div class="grid-2">
+      <div class="step-card">
+        <div class="step-title" style="color:#60a5fa;">💻 Windows / ПК</div>
+        <div class="desc">Лучшие клиенты с поддержкой VLESS Reality:</div>
+        <ul style="padding-left:18px; font-size:13px; color:#cbd5e1; line-height:1.8;">
+          <li><strong>v2rayN</strong> (самый популярный)</li>
+          <li><strong>Nekoray</strong> (простой интерфейс)</li>
+          <li><strong>Hiddify</strong> (красивый и современный)</li>
+        </ul>
+      </div>
+      <div class="step-card">
+        <div class="step-title" style="color:#34d399;">📱 Смартфоны</div>
+        <div class="desc">Приложения из App Store и Google Play:</div>
+        <ul style="padding-left:18px; font-size:13px; color:#cbd5e1; line-height:1.8;">
+          <li><strong>Android:</strong> v2rayNG, Happ, NekoBox</li>
+          <li><strong>iOS (iPhone/iPad):</strong> Streisand, FoXray, V2Box, Sing-box</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Скопировано в буфер обмена!</div>
+
+<script>
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + id).style.display = 'block';
+    btn.classList.add('active');
+  }
+
+  function updateAll() {
+    const ip = document.getElementById('cfg-ip').value.trim() || 'YOUR_SERVER_IP';
+    const user = document.getElementById('cfg-user').value.trim() || 'adminuser';
+    const ssh = document.getElementById('cfg-ssh').value.trim() || '22';
+    const panel = document.getElementById('cfg-panel').value.trim() || '2053';
+
+    document.getElementById('quick-check-ssh').textContent = `ssh -p ${ssh} ${user}@${ip}`;
+    document.getElementById('panel-link').textContent = `http://${ip}:${panel}`;
+    document.getElementById('panel-link').href = `http://${ip}:${panel}`;
+
+    document.querySelectorAll('.tmpl').forEach(code => {
+      if (!code.dataset.orig) {
+        code.dataset.orig = code.textContent;
+      }
+      let text = code.dataset.orig;
+      text = text.replaceAll('{IP}', ip);
+      text = text.replaceAll('{USER}', user);
+      text = text.replaceAll('{SSH}', ssh);
+      text = text.replaceAll('{PANEL}', panel);
+      code.textContent = text;
+    });
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre code');
+    const text = pre.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 2000);
+    });
+  }
+
+  window.onload = updateAll;
+</script>
+
+</body>
+</html>

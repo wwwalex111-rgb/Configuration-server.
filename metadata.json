@@ -1,0 +1,6 @@
+{
+  "name": "Server Setup & 3X-UI Guide",
+  "description": "Интерактивное пошаговое руководство развертывания сервера VPS и настройки 3X-UI VLESS Reality. Interactive step-by-step VPS hardening guide, 3X-UI VLESS Reality configuration, client setup and software handbook.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
